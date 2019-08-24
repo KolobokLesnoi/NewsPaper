@@ -50,9 +50,7 @@ public class MainActivity extends AppCompatActivity {
         tabInitialize();
         listViewInitialize();
         resultListInitialize();
-        setAdapter(favoritesListView,favoritesResultList);
-        setOnListViewOnItemClickListener(favoritesListView,favoritesResultList);
-
+        fillListsViewAndCheckOnFavorites(favoritesListView,favoritesResultList);
 
     }
 
@@ -174,16 +172,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void checkOnFavorites(List<Result> resultList, List<Result> favorites){
-        if(resultList != null & favorites != null) {
-            if (favorites.size() > 0 & resultList.size() > 0) {
-                for (int i = 0; i < resultList.size(); i++) {
-                    for (int j = 0; j < favorites.size(); j++) {
-                        if (resultList.get(i).getId() == favorites.get(j).getId()) {
-                            resultList.get(i).setFavorites(true);
-                        }else {
-                            resultList.get(i).setFavorites(false);
+    private void checkOnFavorites(List<Result> resultList, List<Result> favoritesList){
+        if(resultList != null & favoritesList != null) {
+            if (resultList.size() > 0) {
+                if(favoritesList.size() > 0){
+                    for (Result result : resultList) {
+                        for (Result favorites : favoritesList) {
+                            if (result.getId() == favorites.getId()) {
+                                result.setFavorites(true);
+                            } else {
+                                result.setFavorites(false);
+                            }
                         }
+                    }
+                }else {
+                    for (Result result : resultList) {
+                        result.setFavorites(false);
                     }
                 }
             }
@@ -240,12 +244,13 @@ public class MainActivity extends AppCompatActivity {
                     result.setPhotoURL(cursor.getString(photo));
                     result.setPublishedDate(cursor.getString(publish_date));
                     result.setSource(cursor.getString(source));
-                    result.setFavorites(true);
+//                    result.setFavorites(true);
 
                     resultList.add(result);
                 }while (cursor.moveToNext());
 
             }
+
             database.close();
 
             return resultList;
@@ -256,8 +261,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         fillFavoritesResultList();
-        setAdapter(favoritesListView,favoritesResultList);
-        setOnListViewOnItemClickListener(favoritesListView,favoritesResultList);
+        fillListsViewAndCheckOnFavorites(favoritesListView,favoritesResultList);
         ResultAdapter resultAdapter;
 
         resultAdapter  = (ResultAdapter) emailedListView.getAdapter();
