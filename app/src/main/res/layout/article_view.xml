@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginLeft="10dp"
+            android:layout_marginRight="7dp">
+        <TextView
+                android:text="TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/articleSection" android:layout_weight="1"
+                android:textSize="18sp" android:layout_marginTop="13dp"/>
+        <ImageButton
+                android:layout_height="60dp" app:srcCompat="@drawable/star_off"
+                android:id="@+id/favoritesButton" android:layout_width="60dp"
+                android:scaleType="fitCenter" android:onClick="onClickFavoritesButton"
+                android:background="@android:color/transparent"/>
+    </LinearLayout>
+    <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/articleTitle"
+                    android:textSize="24sp" android:textAlignment="center" android:textColor="@android:color/black"
+                    android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+            <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/articleAbstract" android:textSize="18sp"
+                    android:textColor="@android:color/black" android:paddingTop="20dp" android:paddingLeft="10dp"
+                    android:paddingRight="10dp" android:paddingBottom="20dp"/>
+            <ImageView
+                    app:srcCompat="@android:drawable/ic_menu_gallery"
+                    android:id="@+id/articlePhoto" android:scaleType="centerCrop" android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:layout_weight="1"/>
+            <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/articleSource"
+                    android:textAlignment="center" android:textColor="@android:color/black"
+                    android:paddingTop="20dp"/>
+            <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/articlePublishedDate"
+                    android:textAlignment="center" android:textColor="@android:color/black"
+                    android:layout_marginBottom="10dp"/>
+
+
+
+</LinearLayout>
