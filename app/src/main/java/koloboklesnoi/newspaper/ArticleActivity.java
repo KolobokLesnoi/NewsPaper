@@ -72,6 +72,7 @@ public class ArticleActivity extends AppCompatActivity {
                 InputStream inputStream = openFileInput(result.getId()+".png");
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
                 articlePhoto.setImageBitmap(bitmap);
+                inputStream.close();
             }catch (Exception e){
                 Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
             }
