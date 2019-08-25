@@ -96,16 +96,6 @@ public class ArticleActivity extends AppCompatActivity {
             favoritesButton.setImageResource(R.drawable.star_on);
             dataBaseAsyncTask.execute(databaseManager);
             isFavorites = true;
-
-            try {
-                FileOutputStream fos = openFileOutput(result.getId()+".png",MODE_PRIVATE);
-                Bitmap bitmap = ((BitmapDrawable) articlePhoto.getDrawable()).getBitmap();
-                bitmap.compress(Bitmap.CompressFormat.PNG,0, fos);
-                fos.flush();
-                fos.close();
-            }catch (Exception e){
-                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
-            }
         }
     }
 
@@ -116,8 +106,18 @@ public class ArticleActivity extends AppCompatActivity {
             SQLiteDatabase database = databaseManagers[0].getWritableDatabase();
             if (isFavorites) {
                 database.insert(DatabaseManager.TABLE_NAME, null, getContentValues());
+                try {
+                    FileOutputStream fos = openFileOutput(result.getId()+".png",MODE_PRIVATE);
+                    Bitmap bitmap = ((BitmapDrawable) articlePhoto.getDrawable()).getBitmap();
+                    bitmap.compress(Bitmap.CompressFormat.PNG,0, fos);
+                    fos.flush();
+                    fos.close();
+                }catch (Exception e){
+                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+                }
             } else {
                 database.delete(DatabaseManager.TABLE_NAME, "ID = " + result.getId(), null);
+                deleteFile(result.getId()+".png");
             }
             database.close();
             return null;
