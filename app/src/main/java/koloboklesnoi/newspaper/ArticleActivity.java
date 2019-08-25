@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -61,12 +62,22 @@ public class ArticleActivity extends AppCompatActivity {
         articleSource = (TextView) findViewById(R.id.articleSource);
 
 
-
         articleSection.setText(result.getSection());
         articleTitle.setText(result.getTitle());
         articleAbstract.setText(result.getAbstract());
 
-        Picasso.with(this).load(result.getPhotoURL()).into(articlePhoto);
+
+        if(isFavorites){
+            try {
+                InputStream inputStream = openFileInput(result.getId()+".png");
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                articlePhoto.setImageBitmap(bitmap);
+            }catch (Exception e){
+                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
+            }
+        }else {
+            Picasso.with(this).load(result.getPhotoURL()).into(articlePhoto);
+        }
 
         articlePublishedDate.setText(result.getPublishedDate());
         articleSource.setText(result.getSource());
@@ -85,6 +96,16 @@ public class ArticleActivity extends AppCompatActivity {
             favoritesButton.setImageResource(R.drawable.star_on);
             dataBaseAsyncTask.execute(databaseManager);
             isFavorites = true;
+
+            try {
+                FileOutputStream fos = openFileOutput(result.getId()+".png",MODE_PRIVATE);
+                Bitmap bitmap = ((BitmapDrawable) articlePhoto.getDrawable()).getBitmap();
+                bitmap.compress(Bitmap.CompressFormat.PNG,0, fos);
+                fos.flush();
+                fos.close();
+            }catch (Exception e){
+                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
+            }
         }
     }
 
