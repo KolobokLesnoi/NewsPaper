@@ -93,7 +93,7 @@ public class ArticleActivity extends AppCompatActivity {
         display.getSize(size);
 
         //Увеличить высоту картинки согластно маштабировнию её ширины
-        imageView.setMinimumHeight((size.x/440)*293); //440 и 293 ширина и высота по умо
+        imageView.setMinimumHeight((size.x/440)*293); //440 и 293 ширина и высота по умолчанию
     }
 
     public void onClickFavoritesButton(View view) {
