@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -14,11 +15,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Display;
 import android.view.View;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.squareup.picasso.Picasso;
 import koloboklesnoi.newspaper.database.DatabaseManager;
 import koloboklesnoi.newspaper.model.Result;
@@ -42,6 +41,8 @@ public class ArticleActivity extends AppCompatActivity {
     private ImageButton favoritesButton;
     private boolean isFavorites;
 
+    private String photoFileName;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +50,8 @@ public class ArticleActivity extends AppCompatActivity {
         setContentView(R.layout.article_view);
 
         result = getIntent().getParcelableExtra("result");
+
+        photoFileName = result.getId() + ".png";
 
         favoritesButton = (ImageButton) findViewById(R.id.favoritesButton);
         isFavorites = result.isFavorites();
@@ -61,21 +64,15 @@ public class ArticleActivity extends AppCompatActivity {
         articlePublishedDate = (TextView) findViewById(R.id.articlePublishedDate);
         articleSource = (TextView) findViewById(R.id.articleSource);
 
-
         articleSection.setText(result.getSection());
         articleTitle.setText(result.getTitle());
         articleAbstract.setText(result.getAbstract());
 
+        setScaleType(articlePhoto);
 
+        //Если Избранное загрузить фото из файла иначе из интернета
         if(isFavorites){
-            try {
-                InputStream inputStream = openFileInput(result.getId()+".png");
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                articlePhoto.setImageBitmap(bitmap);
-                inputStream.close();
-            }catch (Exception e){
-                Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
-            }
+            loadPhoto(articlePhoto,photoFileName);
         }else {
             Picasso.with(this).load(result.getPhotoURL()).into(articlePhoto);
         }
@@ -84,6 +81,19 @@ public class ArticleActivity extends AppCompatActivity {
         articleSource.setText(result.getSource());
 
 
+    }
+
+    private void setScaleType(ImageView imageView){
+        // Увеличить ширину по ширине экрана
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+        //Получить размер экрана
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        //Увеличить высоту картинки согластно маштабировнию её ширины
+        imageView.setMinimumHeight((size.x/440)*293); //440 и 293 ширина и высота по умо
     }
 
     public void onClickFavoritesButton(View view) {
@@ -105,20 +115,13 @@ public class ArticleActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(DatabaseManager... databaseManagers) {
             SQLiteDatabase database = databaseManagers[0].getWritableDatabase();
+            //Если при клике было отмеченно как Избранное добавить иначе удалить
             if (isFavorites) {
                 database.insert(DatabaseManager.TABLE_NAME, null, getContentValues());
-                try {
-                    FileOutputStream fos = openFileOutput(result.getId()+".png",MODE_PRIVATE);
-                    Bitmap bitmap = ((BitmapDrawable) articlePhoto.getDrawable()).getBitmap();
-                    bitmap.compress(Bitmap.CompressFormat.PNG,0, fos);
-                    fos.flush();
-                    fos.close();
-                }catch (Exception e){
-                    Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
-                }
+                savePhoto(articlePhoto, photoFileName);
             } else {
                 database.delete(DatabaseManager.TABLE_NAME, "ID = " + result.getId(), null);
-                deleteFile(result.getId()+".png");
+                deletePhoto(photoFileName);
             }
             database.close();
             return null;
@@ -136,5 +139,32 @@ public class ArticleActivity extends AppCompatActivity {
 
             return values;
         }
+    }
+
+    private void savePhoto(ImageView imageView, String name){
+        try {
+            FileOutputStream fos = openFileOutput(name,MODE_PRIVATE);
+            Bitmap bitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+            bitmap.compress(Bitmap.CompressFormat.PNG,0, fos);
+            fos.flush();
+            fos.close();
+        }catch (Exception e){
+            Toast.makeText(getApplicationContext(),e.toString(),Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void loadPhoto(ImageView imageView, String name){
+        try {
+            InputStream inputStream = openFileInput(name);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            imageView.setImageBitmap(bitmap);
+            inputStream.close();
+        }catch (Exception e){
+            Toast.makeText(this,e.toString(),Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void deletePhoto(String name){
+        deleteFile(name);
     }
 }
